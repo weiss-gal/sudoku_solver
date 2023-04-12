@@ -19,52 +19,28 @@ class SSolver {
         return [col, row];
     }
 
-    hasInvalidRepetitions(vals){
-        // create an array of repetitions, where the index is the value and the value is the number of repetitions
-        // use board_size + 1 to allow for zero
-        const reps = new Array(this.board_size + 1);
-        reps.fill(0);
-        vals.forEach(element => reps[element]++);
-        // check if there are any repetitions (except for zero, which is allowed)
-        return reps.slice(1).some(r => r > 1);
-    }
-
-    isValidByCols(board){
-        for(let i = 0; i<this.board_size; i++){
-            const vals = board.map(row => row[i]);
-            if (this.hasInvalidRepetitions(vals))
+    isValidAssignment(board, col, row){
+        let val = board[row][col];
+        // check row and col
+        for (let i = 0; i < this.board_size; i++){
+            if (i !== col && board[row][i] === val)
                 return false;
-        }
+            if (i !== row && board[i][col] === val)
+                return false;
+        } 
+
+        // check square
+        const squareRow = Math.floor(row / this.square_size) * this.square_size ;
+        const squareCol = Math.floor(col / this.square_size) * this.square_size ;
+
+        for (let i = 0; i < this.square_size; i++){
+            for (let j = 0; j < this.square_size; j++){
+                if ((squareRow + i !== row || squareCol + j !== col) && board[squareRow + i][squareCol + j] === val)
+                    return false;
+            }
+        }   
 
         return true;
-    }
-
-    isValidByRows(board){
-        return board.every(row => !this.hasInvalidRepetitions(row));
-    }
-
-    isValidBySquares(board){
-        // Can't use fill with an array, so we need to fill each element with an empty array
-        const valsBySquare = [];
-        for (let i = 0; i < this.board_size; i++)
-            valsBySquare.push([]);
-
-        for (let row = 0; row < this.board_size; row++)
-            for (let col = 0; col < this.board_size; col++){
-                // map col, row to square index
-                const squareIndex = Math.floor(row / this.square_size) * this.square_size + Math.floor(col / this.square_size);
-                valsBySquare[squareIndex].push(board[row][col]);
-            }
-
-        return valsBySquare.every(vals => !this.hasInvalidRepetitions(vals));
-    }
-
-    isValidBoard(board){
-        const byCols = this.isValidByCols(board);
-        const byRows = this.isValidByRows(board);
-        const bySquares = this.isValidBySquares(board);
-        
-        return byCols && byRows && bySquares;
     }
 
     tryOption(board, col, row){
@@ -85,13 +61,13 @@ class SSolver {
         for (let attempted = 1; attempted < 10; attempted++){
             const attempted_board = this.getClone(current_board);
             attempted_board[row][col] = attempted;
-            if (!this.isValidBoard(attempted_board))
+            if (!this.isValidAssignment(attempted_board, col, row))
                 continue;
             
             const [next_col, next_row] = this.getNextPosition(col, row);
             const res = this.tryOption(attempted_board, next_col, next_row);
             
-            // if a solutin found, return it
+            // if a solution found, return it
             if (res !== null)
                 return res;
         }

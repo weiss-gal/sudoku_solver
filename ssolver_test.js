@@ -1,4 +1,4 @@
-import { equal, deepEqual } from 'assert';
+import {equal, deepEqual} from 'assert';
 import SSolver from './ssolver.js';
 
 // copied some examples from https://www.kaggle.com/datasets/bryanpark/sudoku
