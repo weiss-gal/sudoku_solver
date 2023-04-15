@@ -1,5 +1,5 @@
 # about sudoku_solver
-A simple sodoku solver library plus testing code. 
+A simple sudoku solver library plus testing code. 
 This repository is the result of me attempting (successfully) to use the backtracking algorithm to solve a square Sudoku puzzle of unknown size. 
 I tested it successfully against a few examples from Kaggle and its surprisingly fast altough its not really optimized for anything. 
 
